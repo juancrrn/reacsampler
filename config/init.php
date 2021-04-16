@@ -48,6 +48,27 @@ function dd($var)
 }
 
 /**
+ * Función para depuración rápida con nombre de fichero y número de línea.
+ */
+function ddl(?string $message, mixed $var)
+{
+    $bt = debug_backtrace();
+    $caller = array_shift($bt);
+
+    echo 'ddl(): ' . $caller['file'] . ':' . $caller['line'] . "\n";
+
+    if (! is_null($message)) {
+        echo $message . "\n";
+    }
+
+    if (! is_null($var)) {
+        var_dump($var);
+    }
+
+    die();
+}
+
+/**
  * Preparar autocarga de clases registrando una función anónima como
  * implementación de __autoload().
  *
