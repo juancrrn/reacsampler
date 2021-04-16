@@ -2,7 +2,10 @@
 
 namespace Juancrrn\Reacsampler\Common;
 
+use Juancrrn\Reacsampler\Common\Session;
+
 use DateTime;
+use Juancrrn\Reacsampler\Common\View\ViewManager;
 
 /**
  * Inicialización y métodos de la aplicación.
@@ -18,19 +21,24 @@ class App
 {
     
     /**
-     * @var string Instancia actual de la aplicación.
+     * @var string      Instancia actual de la aplicación.
      */
     private static $instance;
     
     /**
-     * @var Session Instancia actual del gestor de sesión.
+     * @var Session     Instancia actual del gestor de sesión.
      */
     private $sessionInstance;
     
     /**
-     * @var Controller Instancia actual del controlador HTTP.
+     * @var Controller  Instancia actual del controlador HTTP.
      */
     private $controllerInstance;
+
+    /**
+     * @var ViewManager Instancia actual del gestor de vistas.
+     */
+    private $viewManagerInstance;
 
     /**
      * @var string $dbConn              Conexión de la instancia a la base 
@@ -67,6 +75,11 @@ class App
      *                                  desarrollo.
      */
     private $devMode;
+
+    /**
+     * 
+     */
+    private const VIEW_RESOURCES_PATH = 'resources/views';
     
     /**
      * Constructor. Al ser privado, asegura que solo habrá una única instancia
@@ -142,11 +155,14 @@ class App
         $this->devMode = $devMode;
 
         // Inicializar gestión de la sesión de usuario.
-        //$this->sessionInstance = new Session();
+        $this->sessionInstance = new Session();
+        $this->sessionInstance->init();
 
-        //$this->sessionInstance->init();
-
+        // Inicializar la gestión del controlador HTTP.
         $this->controllerInstance = new Controller($pathBase);
+        
+        // Inicializar la gestión de vistas.
+        $this->viewManagerInstance = new ViewManager(realpath($root . self::VIEW_RESOURCES_PATH));
     }
 
     /**
@@ -194,6 +210,11 @@ class App
         return $this->controllerInstance;
     }
 
+    public function getViewManagerInstance(): ViewManager
+    {
+        return $this->viewManagerInstance;
+    }
+
     public function getRoot(): string
     {
         return $this->root;
@@ -204,7 +225,7 @@ class App
         return $this->url;
     }
 
-    public function getpathBase(): string
+    public function getPathBase(): string
     {
         return $this->pathBase;
     }

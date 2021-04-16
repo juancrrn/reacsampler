@@ -2,7 +2,8 @@
 
 namespace Juancrrn\Reacsampler\Common;
 
-use Awsw\Gesi\Datos\Usuario;
+use Juancrrn\Reacsampler\Domain\User\User;
+use Juancrrn\Reacsampler\Common\HTTP;
 use Awsw\Gesi\Vistas\Vista;
 
 /**
@@ -18,24 +19,28 @@ use Awsw\Gesi\Vistas\Vista;
 class Session
 {
     // Valor de $_SESSION donde se almacena la información de sesión.
-    const SESSION_SESION = "gesi_sesion";
+    const SESSION_NAME = "reacsampler_session";
 
     // Usuario que ha iniciado sesión.
-    private static $usuario_en_sesion = null;
+    private static $loggedInUser = null;
+    
+    public function __construct()
+    {
+    }
 
     /**
      * Inicializa la gestión de la sesión de usuario.
      */
-    public static function init(): void
+    public function init(): void
     {
         session_start();
         
         if (
-            isset($_SESSION[self::SESSION_SESION]) &&
-            is_object($_SESSION[self::SESSION_SESION]) &&
-            $_SESSION[self::SESSION_SESION] instanceof Usuario
+            isset($_SESSION[self::SESSION_NAME]) &&
+            is_object($_SESSION[self::SESSION_NAME]) &&
+            $_SESSION[self::SESSION_NAME] instanceof User
         ) {
-            self::$usuario_en_sesion = $_SESSION[self::SESSION_SESION];
+            $this->loggedInUser = $_SESSION[self::SESSION_NAME];
         }
     }
 
@@ -44,26 +49,26 @@ class Session
      *
      * @requires No hay ninguna sesión ya iniciada.
      */
-    public static function inicia(Usuario $usuario): void
+    public function doLogIn(User $user): void
     {
         // Actualizamos la última vez que el usuario inició sesión a ahora.
-        $usuario->dbActualizaUltimaSesion();
+        // $user->updateLastSession();
 
         // Por seguridad, forzamos que se genere una nueva cookie de sesión por 
         // si la han capturado antes de hacer login.
         session_regenerate_id(true);
 
-        self::$usuario_en_sesion = $usuario;
-        $_SESSION[self::SESSION_SESION] = self::$usuario_en_sesion;
+        $this->loggedInUser = $user;
+        $_SESSION[self::SESSION_NAME] = $user;
     }
 
     /**
      * Cierra la sesión de un usuario.
      */
-    public static function cierra(): void
+    public function doLogOut(): void
     {
-        self::$usuario_en_sesion = null;
-        unset($_SESSION[self::SESSION_SESION]);
+        $this->loggedInUser = null;
+        unset($_SESSION[self::SESSION_NAME]);
 
         session_destroy();
 
@@ -72,11 +77,11 @@ class Session
 
     /**
      * Comprueba si la sesión está iniciada. Para ello, simplemente comprueba 
-     * si self::$usuario_en_sesion no es nula.
+     * si self::$loggedInUser no es nula.
      */
-    public static function isSesionIniciada(): bool
+    public function isLoggedIn(): bool
     {
-        return self::$usuario_en_sesion !== null;
+        return ! is_null($this->loggedInUser);
     }
 
     /**
@@ -84,33 +89,9 @@ class Session
      *
      * @requires Que haya una sesión iniciada.
      */
-    public static function getUsuarioEnSesion() : Usuario
+    public function getLoggedInUser() : User
     {
-        return self::$usuario_en_sesion;
-    }
-
-    /**
-     * Genera una respuesta HTTP con datos JSON y un código estado HTTP, y para 
-     * la ejecución del script
-     * 
-     * @param int   $httpCode HTTP status code
-     * @param array $messages Messages to send in the response
-     */
-    public static function apiRespondError(int $httpCode, array $messages): void
-    {
-        $errorData = array(
-            'status' => 'error',
-            'error' => $httpCode,
-            'messages' => $messages
-        );
-
-        http_response_code($httpCode);
-
-        header('Content-Type: application/json; charset=utf-8');
-        
-        echo json_encode($errorData);
-        
-        die();
+        return $this->loggedInUser;
     }
 
     /**
@@ -122,13 +103,15 @@ class Session
      *                  que, en lugar de redirigir, debería mostrar un error 
      *                  HTTP.
      */
-    public static function requerirSesionIniciada($api = false): void
+    public function requireLoggedIn($api = false): void
     {
-        if (! self::isSesionIniciada()) {
+        if (! $this->isLoggedIn()) {
             if (! $api) {
-                Vista::encolaMensajeError('Necesitas haber iniciado sesión para acceder a este contenido.', '/sesion/iniciar/');
+                ddl(null, null);
+                //Vista::encolaMensajeError('Necesitas haber iniciado sesión para acceder a este contenido.', '/sesion/iniciar/');
             } else {
-                self::apiRespondError(401, array('No autenticado.')); // HTTP 401 Unauthorized (unauthenticated).
+                ddl(null, null);
+                //HTTP::apiRespondError(401, array('No autenticado.')); // HTTP 401 Unauthorized (unauthenticated).
             }
         }
     }
@@ -141,125 +124,43 @@ class Session
      *                  que, en lugar de redirigir, debería mostrar un error 
      *                  HTTP.
      */
-    public static function requerirSesionNoIniciada($api = false): void
+    public function requireNotLoggedIn($api = false): void
     {
-        if (self::isSesionIniciada()) {
+        if ($this->isLoggedIn()) {
             if (! $api) {
-                Vista::encolaMensajeError('No puedes acceder a esta página habiendo iniciado sesión.', '');
+                ddl(null, null);
+                //Vista::encolaMensajeError('No puedes acceder a esta página habiendo iniciado sesión.', '');
             } else {
-                self::apiRespondError(409, array('No debería estar autenticado.')); // HTTP 409 Conflict.
-            }
-        }
-    }
-    
-    /**
-     * Requiere que haya una sesión iniciada con permisos de personal docente
-     * para acceder al contenido. En caso negativo, redirige al inicio de 
-     * sesión.
-     * 
-     * @param bool $api Indica si se está utilizano el método en la API, por lo 
-     *                  que, en lugar de redirigir, debería mostrar un error 
-     *                  HTTP.
-     */
-    public static function requerirSesionPd($api = false): void
-    {
-        self::requerirSesionIniciada($api);
-
-        if (! self::$usuario_en_sesion->isPd()) {
-            if (! $api) {
-                Vista::encolaMensajeError('No tienes permisos suficientes para acceder a este contenido.', '');
-            } else {
-                self::apiRespondError(403, array('No autorizado.')); // HTTP 401 Forbidden.
-            }
-        }
-    }
-    
-    /**
-     * Requiere que haya una sesión iniciada con permisos de personal de 
-     * secretaría para acceder al contenido. En caso negativo, redirige al 
-     * inicio de sesión.
-     * 
-     * @param bool $api Indica si se está utilizano el método en la API, por lo 
-     *                  que, en lugar de redirigir, debería mostrar un error 
-     *                  HTTP.
-     */
-    public static function requerirSesionPs($api = false): void
-    {
-        self::requerirSesionIniciada($api);
-
-        if (! self::$usuario_en_sesion->isPs()) {
-            if (! $api) {
-                Vista::encolaMensajeError('No tienes permisos suficientes para acceder a este contenido.', '');
-            } else {
-                self::apiRespondError(403, array('No autorizado.')); // HTTP 401 Forbidden.
-            }
-        }
-    }
-    
-    /**
-     * Requiere que haya una sesión iniciada con permisos de estudiante para 
-     * acceder al contenido. En caso negativo, redirige al inicio de sesión.
-     * 
-     * @param bool $api Indica si se está utilizano el método en la API, por lo 
-     *                  que, en lugar de redirigir, debería mostrar un error 
-     *                  HTTP.
-     */
-    public static function requerirSesionEst($api = false): void
-    {
-        self::requerirSesionIniciada($api);
-
-        if (! self::$usuario_en_sesion->isEst()) {
-            if (! $api) {
-                Vista::encolaMensajeError('No tienes permisos suficientes para acceder a este contenido.', '');
-            } else {
-                self::apiRespondError(403, array('No autorizado.')); // HTTP 401 Forbidden.
-            }
-        }
-    }
-    
-    /**
-     * Requiere que haya una sesión iniciada pero SIN permisos de personal de 
-     * secretaría para acceder al contenido. En caso negativo, redirige al 
-     * inicio de sesión.
-     * 
-     * @param bool $api Indica si se está utilizano el método en la API, por lo 
-     *                  que, en lugar de redirigir, debería mostrar un error 
-     *                  HTTP.
-     */
-    public static function requerirSesionNoPs($api = false): void
-    {
-        self::requerirSesionIniciada($api);
-
-        if (self::$usuario_en_sesion->isPs()) {
-            if (! $api) {
-                Vista::encolaMensajeError('Esta vista solo permite el acceso de personal docente y estudiantes.', '');
-            } else {
-                self::apiRespondError(403, array('No autorizado.')); // HTTP 401 Forbidden.
+                ddl(null, null);
+                //HTTP::apiRespondError(409, array('No debería estar autenticado.')); // HTTP 409 Conflict.
             }
         }
     }
 
     /**
-     * Requiere que no haya sesión iniciada, O que haya una sesión iniciada
-     * pero SIN permisos de personal de secretaría para acceder al contenido. 
-     * En caso negativo, redirige al inicio de sesión.
+     * Requiere que haya una sesión iniciada de un usuario de tipo específico.
      * 
-     * @param bool $api Indica si se está utilizano el método en la API, por lo 
-     *                  que, en lugar de redirigir, debería mostrar un error 
-     *                  HTTP.
+     * @param string $testType  Tipo de usuario especificado. Se deben utilizar
+     *                          las constantes de tipo definidas en la parte
+     *                          superior de la clase Domain\User\User.
+     * @param bool $negate      Permite negar el tipo de usuario especificado.
+     * @param bool $api         Indica si se está utilizano el método en la API,
+     *                          por lo que, en lugar de redirigir, debería
+     *                          mostrar un error HTTP.
      */
-    public static function requerirNoPs($api = false): void
+    public function requireLoggedInType(string $testType, ?bool $negate = false, ?bool $api = false): void
     {
-        if(self::isSesionIniciada())
-        {
-            if (self::$usuario_en_sesion->isPs()) {
-                if (! $api) {
-                    Vista::encolaMensajeError('Esta vista solo permite el acceso de personal docente, estudiantes, e invitados.', '');
-                } else {
-                    self::apiRespondError(403, array('No autorizado.')); // HTTP 401 Forbidden.
-                }
+        $this->requireLoggedIn($api);
+
+        if ($this->getLoggedInUser()->isType($testType) == $negate) {
+            if (! $api) {
+                ddl(null, null);
+                //Vista::encolaMensajeError('No tienes permisos suficientes para acceder a este contenido.', '');
+            } else {
+                ddl(null, null);
+                //HTTP::apiRespondError(403, array('No autorizado.'));
             }
-        }       
+        }
     }
 }
 ?>
