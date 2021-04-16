@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!--meta name="theme-color" content="#7b1fa2"--><?php /* TODO */ ?>
+
+        <title>#current-page-name# - Gesi</title>
+
+        <!-- Fuentes -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,700&display=swap">
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="#home-url#/css/bootstrap-v5.0.0-beta3.min.css">
+
+        <!-- Estilos de Gesi -->
+        <link rel="stylesheet" href="#home-url#/css/app.css#v#">
+    </head>
+    <body class="actual-#current-page-id#">
+
+        <div id="loading-progress-bar"><div></div></div>
+
+        <div id="side-menu-wrapper">
+            <div class="m-3">
+                <button type="button" id="btn-side-menu-hide" class="btn btn-sm btn-outline-secondary mr-4">Cerrar</button>
+            </div>
+
+            <nav>
+                <div class="list-group list-group-flush">
+                    <div class="d-mb-block" id="user-menu-mobile">#user-menu#</div>
+                    #side-menu#
+                </div>
+            </nav>
+        </div>
+            
+        <nav id="main-header" class="navbar navbar-expand-lg navbar-light bg-light">
+            <button type="button" id="btn-side-menu-show" class="btn btn-sm btn-outline-secondary mr-4">Menu</button>
+
+            <a class=" navbar-brand" href="#home-url#">
+                <img src="#home-url#/img/logo.svg" height="30" alt="" class="d-block mr-3">
+            </a>
+
+            <div class="ml-auto" id="user-menu">
+                <ul class="navbar-nav">
+                    #user-menu#
+                </ul>
+            </div>
+        </nav>
