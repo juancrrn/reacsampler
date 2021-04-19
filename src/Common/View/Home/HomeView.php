@@ -6,38 +6,36 @@ use Juancrrn\Reacsampler\Common\App;
 use Juancrrn\Reacsampler\Common\View\ViewModel;
 
 /**
- * Error 404: no encontrado.
+ * Vista de página principal
+ * 
+ * @package reacsampler
  *
- * @package awsw-gesi
- * Gesi
- * Aplicación de gestión de institutos de educación secundaria
+ * @author juancrrn
  *
- * @author Andrés Ramiro Ramiro
- * @author Nicolás Pardina Popp
- * @author Pablo Román Morer Olmos
- * @author Juan Francisco Carrión Molina
- *
- * @version 0.0.4
+ * @version 0.0.1
  */
 
 class HomeView extends ViewModel
 {
 
     private const VIEW_RESOURCE_FILE = 'home/view_home';
-    public const VISTA_NOMBRE = "Inicio";
-    public const VISTA_ID = "home";
+    public const VIEW_NAME = "Inicio";
+    public const VIEW_ID = "home";
 
     public function __construct()
     {
-        $this->nombre = self::VISTA_NOMBRE;
-        $this->id = self::VISTA_ID;
+        $this->nombre = self::VIEW_NAME;
+        $this->id = self::VIEW_ID;
     }
 
     public function processContent(): void
     {
         $app = App::getSingleton();
 
-        $filling = array();
+        $filling = array(
+            'app-name' => $app->getName(),
+            'app-url' => $app->getUrl()
+        );
 
         $app->getViewManagerInstance()->renderTemplate(self::VIEW_RESOURCE_FILE, $filling);
     }
