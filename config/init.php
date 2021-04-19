@@ -81,7 +81,7 @@ spl_autoload_register(function ($class)
     $prefix = 'Juancrrn\\Reacsampler\\';
 
     // Directorio base para el prefijo del espacio de nombres.
-    $baseDir = __DIR__ . '/../src/Juancrrn/Reacsampler/';
+    $baseDir = __DIR__ . '/../src/';
 
     // ¿La clase utiliza el prefijo del espacio de nombres?
     $len = strlen($prefix);
