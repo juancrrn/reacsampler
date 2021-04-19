@@ -202,13 +202,15 @@ class ViewManager
         self::printMessages();
 
         echo <<< HTML
-        <div id="main-container" class="container mt-4 mb-4">
+        <section id="main-container" class="container my-4 px-4">
+            <article>
         HTML;
 
         $vista->processContent();
 
         echo <<< HTML
-        </div>
+            </article>
+        </section>
         HTML;
 
         self::injectFooter();
@@ -227,20 +229,20 @@ class ViewManager
      * @param string $paginaId Identificador de la página de destino, para saber
      *                         si es la actual.
      */
-    public function generateSideMenuLink(string $url, $vistaClase): string
+    public function generateMainMenuLink(string $url, $viewClass): string
     {
-        $paginaId = $vistaClase::VISTA_ID;
-        $titulo = $vistaClase::VISTA_NOMBRE;
+        $viewId = $viewClass::VIEW_ID;
+        $viewName = $viewClass::VIEW_NAME;
 
         $appUrl = App::getSingleton()->getUrl();
 
-        $activeClass = $this->getCurrentPageId() === $paginaId ? 'active' : '';
+        $activeClass = $this->getCurrentPageId() === $viewId ? 'active' : '';
 
-        $classAttr = 'class="list-group-item list-group-item-action ' . $activeClass . '"';
+        $classAttr = 'class="nav-link ' . $activeClass . '"';
         $hrefAttr = 'href="' . $appUrl . $url . '"';
 
         $a = <<< HTML
-        <a $classAttr $hrefAttr>$titulo</a>
+        <li class="nav-item"><a $classAttr $hrefAttr>$viewName</a></li>
         HTML;
 
         return $a;
