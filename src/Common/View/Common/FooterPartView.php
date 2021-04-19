@@ -45,6 +45,7 @@ class FooterPartView extends ViewModel
         JS;
 
         $filling = array(
+            'app-name' => $app->getName(),
             'home-url' => $app->getUrl(),
             'js-autoconf' => $jsAutoconf
         );

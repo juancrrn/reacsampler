@@ -28,16 +28,18 @@ class HeaderPartView extends ViewModel
     public function processContent(): void
     {
         $app = App::getSingleton();
+
+        $sessionManager = $app->getSessionInstance();
         $viewManager = $app->getViewManagerInstance();
 
         //$formulario_logout = new FormularioSesionCerrar('');
         //$formulario_logout->gestiona();
         //$formulario_logout->genera();
 
-        $sideMenuBuffer = '';
+        $mainMenuBuffer = '';
 
         // Generar elementos de navegación del menú lateral.
-        $sideMenuBuffer .= $viewManager->generateSideMenuLink('', HomeView::class);
+        $mainMenuBuffer .= $viewManager->generateMainMenuLink('', HomeView::class);
 
         /*
             $sideMenuBuffer .= Vista::generarSideMenuDivider('Acciones públicas');
@@ -92,40 +94,39 @@ class HeaderPartView extends ViewModel
 
             // Generar elementos de la navegación del menú de sesión de usuario.
         */
-        $userMenuBuffer = '';
-        /*
+
+        $userMenuBuffer = ''; 
+
+        if ($sessionManager->isLoggedIn()) {
+            $u = $sessionManager->getLoggedInUser();
+
+            /*$nombre = $u->getNombreCompleto();
+
+            $url_editar = $urlInicio . '/sesion/perfil/';
             
+            $badges = '';
+            $badges .= $u->isEst() ? '<span class="badge badge-secondary">Estudiante</span>' : '';
+            $badges .= $u->isPd() ? '<span class="badge badge-secondary">Personal docente</span>' : '';
+            $badges .= $u->isPs() ? '<span class="badge badge-secondary">Personal de Secretaría</span>' : '';
 
-            if (Sesion::isSesionIniciada()) {
-                $u = Sesion::getUsuarioEnSesion();
+            $formularioLogoutHtml = $formulario_logout->getHtml();
 
-                $nombre = $u->getNombreCompleto();
+            $userMenuBuffer .= Vista::generarUserMenuItem("<a class=\"nav-link\" href=\"$url_editar\">$nombre $badges</a>", 'mi-perfil');
+            $userMenuBuffer .= Vista::generarUserMenuItem($formularioLogoutHtml);*/
+        } else {
+            $loginUrl = $app->getUrl() . '/auth/login/';
 
-                $url_editar = $urlInicio . '/sesion/perfil/';
-                
-                $badges = '';
-                $badges .= $u->isEst() ? '<span class="badge badge-secondary">Estudiante</span>' : '';
-                $badges .= $u->isPd() ? '<span class="badge badge-secondary">Personal docente</span>' : '';
-                $badges .= $u->isPs() ? '<span class="badge badge-secondary">Personal de Secretaría</span>' : '';
-
-                $formularioLogoutHtml = $formulario_logout->getHtml();
-
-                $userMenuBuffer .= Vista::generarUserMenuItem("<a class=\"nav-link\" href=\"$url_editar\">$nombre $badges</a>", 'mi-perfil');
-                $userMenuBuffer .= Vista::generarUserMenuItem($formularioLogoutHtml);
-            } else {
-                $url = $urlInicio . '/sesion/iniciar/';
-
-                $userMenuBuffer .= Vista::generarUserMenuItem("<a class=\"nav-link\" href=\"$url\">Iniciar sesión</a>", 'sesion-iniciar');
-            }
-        */
+            $userMenuBuffer .= $viewManager->generateUserMenuItem("<a class=\"nav-link\" href=\"$loginUrl\">Iniciar sesión</a>", 'sesion-iniciar');
+        }
 
         $filling = array(
+            'app-name' => $app->getName(),
             'current-page-name' => $viewManager->getCurrentPageName(),
             'current-page-id' => $viewManager->getCurrentPageId(),
             'home-url' => $app->getUrl(),
             'v' => (! $app->isDevMode()) ? '' : '?v=0.0.0' . time(),
-            'user-menu' => $userMenuBuffer,
-            'side-menu' => $sideMenuBuffer
+            'main-menu-items' => $mainMenuBuffer,
+            'user-menu-items' => $userMenuBuffer
         );
 
         $app->getViewManagerInstance()->renderTemplate(self::VIEW_RESOURCE_FILE, $filling);
