@@ -22,7 +22,7 @@ class Session
     const SESSION_NAME = "reacsampler_session";
 
     // Usuario que ha iniciado sesión.
-    private static $loggedInUser = null;
+    private $loggedInUser = null;
     
     public function __construct()
     {
