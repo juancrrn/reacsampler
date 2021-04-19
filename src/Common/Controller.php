@@ -32,7 +32,7 @@ class Controller
      */
     public function any(string $route, callable $handler): void
     {
-        self::processRequest($route, $handler);
+        $this->processRequest($route, $handler);
     }
 
     /**
@@ -44,7 +44,7 @@ class Controller
     public function get(string $route, callable $handler): void
     {
         if (HTTP::isRequestMethod(HTTP::METHOD_GET))
-            self::processRequest($route, $handler);
+            $this->processRequest($route, $handler);
     }
 
     /**
@@ -56,7 +56,7 @@ class Controller
     public function post(string $route, callable $handler): void
     {
         if (HTTP::isRequestMethod(HTTP::METHOD_POST))
-            self::processRequest($route, $handler);
+            $this->processRequest($route, $handler);
     }
 
     /**
@@ -68,7 +68,7 @@ class Controller
     public function put(string $route, callable $handler): void
     {
         if (HTTP::isRequestMethod(HTTP::METHOD_PUT))
-            self::processRequest($route, $handler);
+            $this->processRequest($route, $handler);
     }
 
     /**
@@ -80,7 +80,7 @@ class Controller
     public function delete(string $route, callable $handler): void
     {
         if (HTTP::isRequestMethod(HTTP::METHOD_DELETE))
-            self::processRequest($route, $handler);
+            $this->processRequest($route, $handler);
     }
 
     /**
@@ -92,7 +92,7 @@ class Controller
     public function patch(string $route, callable $handler): void
     {
         if (HTTP::isRequestMethod(HTTP::METHOD_PATCH))
-            self::processRequest($route, $handler);
+            $this->processRequest($route, $handler);
     }
 
     /**
