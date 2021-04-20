@@ -123,8 +123,8 @@ class HeaderPartView extends ViewModel
             'app-name' => $app->getName(),
             'current-page-name' => $viewManager->getCurrentPageName(),
             'current-page-id' => $viewManager->getCurrentPageId(),
-            'home-url' => $app->getUrl(),
-            'v' => (! $app->isDevMode()) ? '' : '?v=0.0.0' . time(),
+            'app-url' => $app->getUrl(),
+            'cache-version' => (! $app->isDevMode()) ? '' : '?v=0.0.0' . time(),
             'main-menu-items' => $mainMenuBuffer,
             'user-menu-items' => $userMenuBuffer
         );
