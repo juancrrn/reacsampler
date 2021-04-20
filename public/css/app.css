@@ -1,5 +1,33 @@
+/**
+ * Estilos principales.
+ * 
+ * @package reacsampler
+ *
+ * @author juancrrn
+ *
+ * @version 0.0.1
+ */
+
 :root {
 
+}
+
+ *, html, body, header,footer, section, aside, div, ul, li, a, p, h1, h2, h3, h4, span, table, tr, td {
+    margin: 0;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-family: "Ubuntu", "Helvetica", Arial, sans-serif;
+    border-collapse: collapse;
+}
+
+.material-icons {
+    display: inline-block;
+    vertical-align: middle;
+    font-weight: inherit;
+    line-height: inherit;
+    font-size: inherit;
 }
 
 .rcs-pretext {
