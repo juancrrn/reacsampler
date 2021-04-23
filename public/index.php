@@ -5,12 +5,45 @@ require_once __DIR__ . '/../config/init.php';
 use Juancrrn\Reacsampler\Common\App;
 use Juancrrn\Reacsampler\Common\View\Error\Error404View;
 use Juancrrn\Reacsampler\Common\View\Home\HomeView;
+use Juancrrn\Reacsampler\Domain\User\UserRepository;
 
 $app = App::getSingleton();
 
 $controller = $app->getControllerInstance();
 
 $viewManager = $app->getViewManagerInstance();
+
+$controller->get('/demo/inject/', function () use ($viewManager, $app) {
+    /*$patient = new \Juancrrn\Reacsampler\Domain\User\Patient\Patient(
+        7298374,
+        '12345678A',
+        \Juancrrn\Reacsampler\Domain\User\User::TYPE_LAB_STAFF,
+        'Pedro',
+        'Martínez Giménez',
+        '+123123456789',
+        'pedromg@invalid.email',
+        \DateTime::createFromFormat(
+            \Juancrrn\Reacsampler\Common\Tools::MYSQL_DATE_FORMAT,
+            '1999-11-17'
+        ),
+        \DateTime::createFromFormat(
+            \Juancrrn\Reacsampler\Common\Tools::MYSQL_DATETIME_FORMAT,
+            '2021-04-23 15:16:21'
+        ),
+        \DateTime::createFromFormat(
+            \Juancrrn\Reacsampler\Common\Tools::MYSQL_DATETIME_FORMAT,
+            '2021-04-23 15:16:21'
+        ),
+        'Calle Alcalá, 34, 3 B, 28005, Madrid',
+        '9783450998397',
+        '8204958309480958',
+        'male',
+        'man',
+        'he/him'
+    );*/
+
+    var_dump((new UserRepository($app->getDbConn()))->retrieveById(1));
+});
 
 /**
  * Vistas de inicio
