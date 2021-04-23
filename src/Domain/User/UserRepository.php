@@ -4,6 +4,8 @@ namespace Juancrrn\Reacsampler\Domain\User;
 
 use Juancrrn\Reacsampler\Common\App;
 use Juancrrn\Reacsampler\Domain\Repository;
+use Juancrrn\Reacsampler\Domain\User\LabStaff\LabStaffRepository;
+use Juancrrn\Reacsampler\Domain\User\Patient\PatientRepository;
 
 class UserRepository implements Repository
 {
@@ -45,6 +47,24 @@ class UserRepository implements Repository
         throw new \Exception('Not implemented');
     }
 
+    private function switchAndCompleteType(object $mysqli_object)
+    {
+        switch ($mysqli_object->type) {
+            case User::TYPE_LAB_STAFF:
+                //return (new LabStaffRepository($this->db))->completeModel($mysqli_object);
+            case User::TYPE_MANAGEMENT_STAFF:
+                break;//return (new ManagementStaffRepository($this->db))->completeModel($mysqli_object);
+            case User::TYPE_MEDICAL_STAFF:
+                break;//return (new MedicalStaffRepository($this->db))->completeModel($mysqli_object);
+            case User::TYPE_NURSING_STAFF:
+                break;//return (new NursingStaffRepository($this->db))->completeModel($mysqli_object);
+            case User::TYPE_PATIENT:
+                return (new PatientRepository($this->db))->completeModel($mysqli_object);
+            default:
+                throw new \OutOfBoundsException('Invalid user type.');
+        }
+    }
+
     public function retrieveById(int $id)/*: static*/
     {
         $query = <<< SQL
@@ -72,43 +92,48 @@ class UserRepository implements Repository
         $stmt->execute();
         $resultado = $stmt->get_result();
         
-        $user = $resultado->fetch_object();
+        $mysqli_object = $resultado->fetch_object();
 
-        var_dump($user);
+        $user = $this->switchAndCompleteType($mysqli_object);
 
-        // Comprobar tipo de usuario
-        // Pasar a la subclase repositorio para que lo complete
-        // Que devuelva un objeto del tipo correspondiente
-
-        switch ($user->type) {
-            case User::TYPE_LAB_STAFF:
-                break;
-            case User::TYPE_MANAGEMENT_STAFF:
-                break;
-            case User::TYPE_MEDICAL_STAFF:
-                break;
-            case User::TYPE_NURSING_STAFF:
-                break;
-            case User::TYPE_PATIENT:
-                break;
-            default:
-                throw new \OutOfBoundsException('Invalid user type.');
-        }
-
-        //$usuario = Usuario::fromMysqlFetch($resultado->fetch_object());
         $stmt->close();
-        
-        //return $usuario;
 
-
-        //echo "Hello";
-        // Comprobar el tipo de usuario y llamar al constructor correspondiente
-        //throw new \Exception('Not implemented');
+        return $user;
     }
 
     public function retrieveAll(): array
     {
-        throw new \Exception('Not implemented');
+        $query = <<< SQL
+        SELECT 
+            id,
+            gov_id,
+            type,
+            first_name,
+            last_name,
+            phone_number,
+            email_address,
+            hashed_password,
+            birth_date,
+            registration_date,
+            last_login_date
+        FROM
+            users
+        LIMIT 1
+        SQL;
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
+
+        $users = array();
+
+        while ($mysqli_object = $resultado->fetch_object()) {
+            $users[] = $this->switchAndCompleteType($mysqli_object);
+        }
+
+        $stmt->close();
+
+        return $users;
     }
 
     public function verifyConstraints(): bool|array
