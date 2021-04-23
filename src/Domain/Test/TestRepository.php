@@ -72,24 +72,24 @@ class TestRepository implements Repository
         throw new \Exception('Not implemented');
     }
 
-    public static function findById(int $id): bool|int
+    public function findById(int $id): bool|int
     {
         throw new \Exception('Not implemented');
     }
 
-    public static function findByNif(string $nif): bool|int
+    public function findByNif(string $nif): bool|int
     {
         throw new \Exception('Not implemented');
     }
 
-    public static function retrieveById(int $id): static
+    public function retrieveById(int $id): static
     {
         echo "Hello";
         // Comprobar el tipo de usuario y llamar al constructor correspondiente
         throw new \Exception('Not implemented');
     }
 
-    public static function retrieveAll(): array
+    public function retrieveAll(): array
     {
         throw new \Exception('Not implemented');
     }
@@ -104,7 +104,7 @@ class TestRepository implements Repository
         throw new \Exception('Not implemented');
     }
 
-    public static function deleteById(int $id): bool
+    public function deleteById(int $id): bool
     {
         throw new \Exception('Not implemented');
     }
