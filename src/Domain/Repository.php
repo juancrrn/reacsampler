@@ -53,20 +53,29 @@ interface Repository
     public function save(): bool|int;
 
     /**
+     * Comprueba si existe un objeto en la base de datos en base a su id.
+     * 
+     * @param int $id Identificador del objeto.
+     * 
+     * @return bool|int False si no existe o el id en caso contrario.
+     */
+    public static function findById(int $id): bool|int;
+
+    /**
      * Recoge un objeto de la base de datos.
      * 
      * @param int $id Identificador del objeto.
      * 
      * @return bool|static Objeto o false si no existe.
      */
-    public static function findById(int $id): bool|static;
+    public static function retrieveById(int $id): bool|static;
 
     /**
      * Recoge todos los objetos de la base de datos.
      * 
      * @return array Lista con todos los objetos.
      */
-    public static function findAll(): array;
+    public static function retrieveAll(): array;
 
     /**
      * Comprueba si un objeto se puede eliminar, es decir, que no está 
@@ -78,9 +87,9 @@ interface Repository
      * 
      * @return array  En caso de haberlas, devuelve un array con los nombres de 
      *                las tablas donde hay referencias al objeto. Si no las 
-     *                hay, devuelve un array vacío.
+     *                hay, devuelve false.
      */
-    public static function dbCompruebaRestricciones(int $id): array;
+    public function verifyConstraints(): bool|array;
 
     /*
      *
@@ -97,7 +106,18 @@ interface Repository
      * 
      * @return bool   Resultado de la ejecución de la sentencia.
      */
-    public static function dbEliminar(int $id): bool;
+    public function delete(): bool;
+
+    /**
+     * Elimina un objeto de la base de datos.
+     * 
+     * @requires      El objeto existe.
+     * 
+     * @param int $id Identificador del objeto.
+     * 
+     * @return bool   Resultado de la ejecución de la sentencia.
+     */
+    public static function deleteById(int $id): bool;
 }
 
 ?>
