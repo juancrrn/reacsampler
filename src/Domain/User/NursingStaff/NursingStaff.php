@@ -31,7 +31,7 @@ class NursingStaff extends User
         string      $emailAddress,
         \DateTime   $birthDate,
         \DateTime   $registrationDate,
-        \DateTime   $lastLoginDate,
+        ?\DateTime  $lastLoginDate,
         string      $field,
         string      $collegiateNumber
     )

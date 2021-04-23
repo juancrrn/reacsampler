@@ -24,7 +24,7 @@ class ManagementStaff extends User
         string      $emailAddress,
         \DateTime   $birthDate,
         \DateTime   $registrationDate,
-        \DateTime   $lastLoginDate,
+        ?\DateTime  $lastLoginDate,
         string      $area,
         string      $collegiateNumber
     )

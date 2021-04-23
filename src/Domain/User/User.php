@@ -137,7 +137,7 @@ abstract class User
         string      $emailAddress,
         \DateTime   $birthDate,
         \DateTime   $registrationDate,
-        \DateTime   $lastLoginDate,
+        ?\DateTime  $lastLoginDate,
     )
     {
         $this->id               = $id;

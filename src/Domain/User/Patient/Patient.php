@@ -47,7 +47,7 @@ class Patient extends User
         string      $emailAddress,
         \DateTime   $birthDate,
         \DateTime   $registrationDate,
-        \DateTime   $lastLoginDate,
+        ?\DateTime  $lastLoginDate,
         string      $postalAddress,
         string      $cipaCode,
         string      $csnsCode,
