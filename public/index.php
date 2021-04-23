@@ -42,7 +42,7 @@ $controller->get('/demo/inject/', function () use ($viewManager, $app) {
         'he/him'
     );*/
 
-    var_dump((new UserRepository($app->getDbConn()))->retrieveById(1));
+    var_dump((new UserRepository($app->getDbConn()))->retrieveAll());
 });
 
 /**
