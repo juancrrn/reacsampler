@@ -30,29 +30,83 @@ class UserRepository implements Repository
         $this->db = App::getSingleton()->getDbConn();
     }
 
-    public function save(): bool|int
+    public function update(): bool|int
     {
         throw new \Exception('Not implemented');
     }
 
-    public static function findById(int $id): bool|int
+    public function findById(int $id): bool|int
     {
         throw new \Exception('Not implemented');
     }
 
-    public static function findByNif(string $nif): bool|int
+    public function findByNif(string $nif): bool|int
     {
         throw new \Exception('Not implemented');
     }
 
-    public static function retrieveById(int $id): static
+    public function retrieveById(int $id)/*: static*/
     {
-        echo "Hello";
+        $query = <<< SQL
+        SELECT 
+            id,
+            gov_id,
+            type,
+            first_name,
+            last_name,
+            phone_number,
+            email_address,
+            hashed_password,
+            birth_date,
+            registration_date,
+            last_login_date
+        FROM
+            users
+        WHERE
+            id = ?
+        LIMIT 1
+        SQL;
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
+        
+        $user = $resultado->fetch_object();
+
+        var_dump($user);
+
+        // Comprobar tipo de usuario
+        // Pasar a la subclase repositorio para que lo complete
+        // Que devuelva un objeto del tipo correspondiente
+
+        switch ($user->type) {
+            case User::TYPE_LAB_STAFF:
+                break;
+            case User::TYPE_MANAGEMENT_STAFF:
+                break;
+            case User::TYPE_MEDICAL_STAFF:
+                break;
+            case User::TYPE_NURSING_STAFF:
+                break;
+            case User::TYPE_PATIENT:
+                break;
+            default:
+                throw new \OutOfBoundsException('Invalid user type.');
+        }
+
+        //$usuario = Usuario::fromMysqlFetch($resultado->fetch_object());
+        $stmt->close();
+        
+        //return $usuario;
+
+
+        //echo "Hello";
         // Comprobar el tipo de usuario y llamar al constructor correspondiente
-        throw new \Exception('Not implemented');
+        //throw new \Exception('Not implemented');
     }
 
-    public static function retrieveAll(): array
+    public function retrieveAll(): array
     {
         throw new \Exception('Not implemented');
     }
@@ -67,7 +121,7 @@ class UserRepository implements Repository
         throw new \Exception('Not implemented');
     }
 
-    public static function deleteById(int $id): bool
+    public function deleteById(int $id): bool
     {
         throw new \Exception('Not implemented');
     }

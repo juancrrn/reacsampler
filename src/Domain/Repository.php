@@ -50,7 +50,7 @@ interface Repository
      *                      ha habido algún problema y, en el caso de inserción,
      *                      el identificador del objeto insertado.
      */
-    public function save(): bool|int;
+    public function update(): bool|int;
 
     /**
      * Comprueba si existe un objeto en la base de datos en base a su id.
@@ -59,7 +59,7 @@ interface Repository
      * 
      * @return bool|int False si no existe o el id en caso contrario.
      */
-    public static function findById(int $id): bool|int;
+    public function findById(int $id): bool|int;
 
     /**
      * Recoge un objeto de la base de datos.
@@ -68,14 +68,14 @@ interface Repository
      * 
      * @return bool|static Objeto o false si no existe.
      */
-    public static function retrieveById(int $id): bool|static;
+    public function retrieveById(int $id)/*: bool|static*/;
 
     /**
      * Recoge todos los objetos de la base de datos.
      * 
      * @return array Lista con todos los objetos.
      */
-    public static function retrieveAll(): array;
+    public function retrieveAll(): array;
 
     /**
      * Comprueba si un objeto se puede eliminar, es decir, que no está 
@@ -117,7 +117,7 @@ interface Repository
      * 
      * @return bool   Resultado de la ejecución de la sentencia.
      */
-    public static function deleteById(int $id): bool;
+    public function deleteById(int $id): bool;
 }
 
 ?>
