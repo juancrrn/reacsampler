@@ -41,8 +41,7 @@ class App
     private $viewManagerInstance;
 
     /**
-     * @var string $dbConn              Conexión de la instancia a la base 
-     *                                  de datos.
+     * @var \mysqli $dbConn Conexión de la instancia a la base de datos.
      */
     private $dbConn;
 
@@ -168,30 +167,30 @@ class App
     /**
      * Inicia una conexión con la base de datos.
      */
-    public function bbddCon() : \mysqli
+    public function getDbConn() : \mysqli
     {
-        if (! $this->bbdd_con) {
-            $host = $this->bbdd_datos["host"];
-            $user = $this->bbdd_datos["user"];
-            $password = $this->bbdd_datos["password"];
-            $name = $this->bbdd_datos["name"];
+        if (! $this->dbConn) {
+            $host = $this->dbCredentials["host"];
+            $user = $this->dbCredentials["user"];
+            $password = $this->dbCredentials["password"];
+            $name = $this->dbCredentials["name"];
 
-            $driver = new \mysqli_driver();
+            //$driver = new \mysqli_driver();
 
             try {
-                $this->bbdd_con = new \mysqli($host, $user, $password, $name);
+                $this->dbConn = new \mysqli($host, $user, $password, $name);
             } catch (\mysqli_sql_exception $e) {
                 throw new \Exception("Error al conectar con la base de datos.", 0, $e);
             }
 
             try {
-                $this->bbdd_con->set_charset("utf8mb4");
+                $this->dbConn->set_charset("utf8mb4");
             } catch (\mysqli_sql_exception $e) {
                 throw new \Exception("Error al configurar la codificación de la base de datos.", 1);
             }
         }
 
-        return $this->bbdd_con;
+        return $this->dbConn;
     }
 
     /*
