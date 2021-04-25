@@ -394,17 +394,11 @@ class ViewManager
      * @param string|null $paginaId Identificador de la página de destino, para 
      *                              saber si es la actual.
      */
-    public function generateUserMenuItem(string $content, $paginaId = null): string
+    public function generateUserMenuItem(string $content): string
     {
-        $activeClass = $this->getCurrentPageId() === $paginaId ? 'active' : '';
-
-        $classAttr = 'class="nav-item ' . $activeClass . '"';
-
-        $span = <<< HTML
-        <span $classAttr>$content</span>
+        return <<< HTML
+        <span class="nav-item">$content</span>
         HTML;
-
-        return $span;
     }
 
     /*

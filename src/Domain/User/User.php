@@ -187,6 +187,11 @@ abstract class User
         return $this->lastName;
     }
 
+    public function getFullName(): string
+    {
+        return $this->firstName . ' ' . $this->lastName;
+    }
+
     public function getPhoneNumber(): string
     {
         return $this->phoneNumber;

@@ -27,8 +27,8 @@ class LoginView extends ViewModel
 {
     private const VIEW_RESOURCE_FILE = 'auth/view_login';
 
-    private const VIEW_NOMBRE = "Iniciar sesión";
-    private const VIEW_ID = "sesion-iniciar";
+    public const VIEW_NOMBRE = "Iniciar sesión";
+    public const VIEW_ID = "auth-login";
 
     private $form;
 
