@@ -34,19 +34,12 @@ class LoginForm extends StaticForm
             $nif = isset($preloadedData['nif']) ? $preloadedData['nif'] : $nif;
         }
 
-        $html = <<< HTML
-        <div class="mb-3">
-            <label class="form-label" for="nif">NIF o NIE</label>
-            <input class="form-control" id="nif" type="text" name="nif" placeholder="NIF o NIE" value="$nif">
-        </div>
-        <div class="mb-3">
-            <label class="form-label" for="password">Contraseña</label>
-            <input class="form-control" id="password" type="password" name="password" placeholder="Contraseña">
-        </div>
-        <button type="submit" class="btn btn-primary" name="login">Continuar</button>
-        HTML;
-
-        return $html;
+        return App::getSingleton()->getViewManagerInstance()->generateTemplateRender(
+            'forms/auth/inputs_login_form',
+            array(
+                'nif' => $nif
+            )
+        );
     }
     
     protected function process(array & $postedData): void
