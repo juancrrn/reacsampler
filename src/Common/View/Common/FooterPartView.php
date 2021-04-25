@@ -47,7 +47,8 @@ class FooterPartView extends ViewModel
         $filling = array(
             'app-name' => $app->getName(),
             'home-url' => $app->getUrl(),
-            'js-autoconf' => $jsAutoconf
+            'js-autoconf' => $jsAutoconf,
+            'cache-version' => (! $app->isDevMode()) ? '' : '?v=0.0.0' . time(),
         );
 
         $app->getViewManagerInstance()->renderTemplate(self::VIEW_RESOURCE_FILE, $filling);
