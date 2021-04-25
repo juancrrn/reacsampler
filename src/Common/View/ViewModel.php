@@ -14,7 +14,7 @@ namespace Juancrrn\Reacsampler\Common\View;
 
 abstract class ViewModel
 {
-	protected $nombre;
+	protected $name;
 	protected $id;
 
 	/**
@@ -25,7 +25,7 @@ abstract class ViewModel
 
 	public function getName(): string
 	{
-		return $this->nombre;
+		return $this->name;
 	}
 
 	public function getId(): string

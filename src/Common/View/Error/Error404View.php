@@ -24,7 +24,7 @@ class Error404View extends ViewModel
 
     public function __construct()
     {
-        $this->nombre = self::VIEW_NAME;
+        $this->name = self::VIEW_NAME;
         $this->id = self::VIEW_ID;
     }
 
