@@ -45,9 +45,35 @@ class UserRepository implements Repository
         throw new \Exception('Not implemented');
     }
 
-    public function findByNif(string $nif): bool|int
+    public function findByGovId(string $testGovId): bool|int
     {
-        throw new \Exception('Not implemented');
+        $testGovId = mb_strtoupper($testGovId);
+
+        $query = <<< SQL
+        SELECT 
+            id
+        FROM
+            users
+        WHERE
+            gov_id = ?
+        LIMIT 1
+        SQL;
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('s', $testGovId);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if ($result->num_rows != 1) {
+            $return = false;
+        } else {
+            $return = $result->fetch_object()->id;
+        }
+
+        $stmt->close();
+
+        return $return;
     }
 
     private function switchAndCompleteType(object $mysqli_object)
@@ -79,7 +105,6 @@ class UserRepository implements Repository
             last_name,
             phone_number,
             email_address,
-            hashed_password,
             birth_date,
             registration_date,
             last_login_date
@@ -104,6 +129,31 @@ class UserRepository implements Repository
         return $user;
     }
 
+    public function retrieveJustHashedPasswordById(int $id): string
+    {
+        $query = <<< SQL
+        SELECT
+            hashed_password
+        FROM
+            users
+        WHERE
+            id = ?
+        LIMIT 1
+        SQL;
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        
+        $hashedPassword = $result->fetch_object()->hashed_password;
+
+        $stmt->close();
+
+        return $hashedPassword;
+    }
+
     public function retrieveAll(): array
     {
         $query = <<< SQL
@@ -115,7 +165,6 @@ class UserRepository implements Repository
             last_name,
             phone_number,
             email_address,
-            hashed_password,
             birth_date,
             registration_date,
             last_login_date

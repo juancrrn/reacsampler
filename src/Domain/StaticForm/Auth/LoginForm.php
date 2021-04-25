@@ -55,12 +55,12 @@ class LoginForm extends StaticForm
         $view = $app->getViewManagerInstance();
 
         $userRepository = new UserRepository($app->getDbConn());
-
+        
         $nif = isset($postedData['nif']) ? $postedData['nif'] : null;
                 
         if (empty($nif)) {
             $view->addErrorMessage('El NIF o NIE no puede estar vacío.');
-        } elseif (! $userRepository->findByNif($nif)) {
+        } elseif (! $userRepository->findByGovId($nif)) {
             $view->addErrorMessage('El NIF o NIE y la contraseña introducidos no coinciden.');
         }
         
@@ -69,25 +69,22 @@ class LoginForm extends StaticForm
         if (empty($password)) {
             $view->addErrorMessage('La contraseña no puede estar vacía.');
         }
-        
+
         // Si no hay ningún error, continuar.
         if (! $view->anyErrorMessages()) {
-
-            $user = $userRepository->retrieveById($userRepository->findByNif($nif));
-            var_dump($user);
+            $userId = $userRepository->findByGovId($nif);
 
             // Comprobar si la contraseña es correcta.
-            /*if (! password_verify($password, $user->getPassword())) {
+            if (! password_verify($password, $userRepository->retrieveJustHashedPasswordById($userId))) {
                 $view->addErrorMessage('El NIF o NIE y la contraseña introducidos no coinciden.');
             } else {
                 $sessionManager = $app->getSessionInstance();
 
-                $sessionManager->doLogIn($user);
+                $sessionManager->doLogIn($userRepository->retrieveById($userId));
 
                 header("Location: " . $app->getUrl());
-                
                 die();
-            }*/
+            }
 
         }
 
