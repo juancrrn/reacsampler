@@ -42,3 +42,27 @@
     margin-top: 3rem;
     margin-bottom: 3rem;
 }
+
+/*
+ * Formulario de cierre de sesión.
+ */
+
+#form-logout {
+    background: transparent;
+    padding: 0;
+    border: none;
+    margin: 0;
+    border-radius: 0;
+}
+
+#form-logout button {
+    cursor: pointer;
+    color: rgb(123, 31, 162);
+    font-family: inherit;
+    line-height: 24px;
+    background: none;
+    border: none;
+    font-size: inherit;
+    display: block;
+    padding: .5rem 1rem;
+}
