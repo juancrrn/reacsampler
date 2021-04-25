@@ -6,6 +6,7 @@ use Juancrrn\Reacsampler\Common\App;
 use Juancrrn\Reacsampler\Common\View\Auth\LoginView;
 use Juancrrn\Reacsampler\Common\View\Error\Error404View;
 use Juancrrn\Reacsampler\Common\View\Home\HomeView;
+use Juancrrn\Reacsampler\Domain\StaticForm\Auth\LogoutForm;
 
 $app = App::getSingleton();
 
@@ -45,7 +46,7 @@ $controller->post('/auth/login/', function () use ($viewManager) {
 
 // Envío del formulario de cierre de sesión
 $controller->post('/auth/logout/', function () use ($viewManager) {
-    throw new Exception('Route declared but not implemented.');
+    (new LogoutForm('/auth/logout/'))->handle();
 });
 
 // Restablecimiento de contraseña
