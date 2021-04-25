@@ -2,6 +2,7 @@
 
 namespace Juancrrn\Reacsampler\Domain\User\Patient;
 
+use Exception;
 use Juancrrn\Reacsampler\Common\Tools;
 use Juancrrn\Reacsampler\Domain\User\UserRepository;
 
@@ -68,9 +69,13 @@ class PatientRepository extends UserRepository
         $stmt = $this->db->prepare($query);
         $stmt->bind_param('i', $mysqli_object->id);
         $stmt->execute();
-        $resultado = $stmt->get_result();
+
+        $result = $stmt->get_result();
+
+        if ($result->num_rows != 1)
+            throw new Exception('Row not found in specific type table.');
         
-        $typeSpecificProperties = $resultado->fetch_object();
+        $typeSpecificProperties = $result->fetch_object();
         $mergedObjects = (object) array_merge((array) $mysqli_object, (array) $typeSpecificProperties);
 
         $labStaffUser = self::createModelFromMysql($mergedObjects);

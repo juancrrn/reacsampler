@@ -8,13 +8,6 @@ class NursingStaff extends User
 {
 
     /**
-     * Especialidad (área o campo).
-     * 
-     * @var string $field
-     */
-    private $field;
-
-    /**
      * Número de colegiación.
      * 
      * @var string $collegiateNumber
@@ -32,7 +25,6 @@ class NursingStaff extends User
         \DateTime   $birthDate,
         \DateTime   $registrationDate,
         ?\DateTime  $lastLoginDate,
-        string      $field,
         string      $collegiateNumber
     )
     {
@@ -49,7 +41,6 @@ class NursingStaff extends User
             $lastLoginDate
         );
 
-        $this->field            = $field;
         $this->collegiateNumber = $collegiateNumber;
     }
 
