@@ -38,8 +38,23 @@ $controller->get('/auth/login/', function () use ($viewManager) {
     $viewManager->render(new LoginView);
 });
 
+// Envío del formulario de inicio de sesión
+$controller->post('/auth/login/', function () use ($viewManager) {
+    $viewManager->render(new LoginView);
+});
+
+// Envío del formulario de cierre de sesión
+$controller->post('/auth/logout/', function () use ($viewManager) {
+    throw new Exception('Route declared but not implemented.');
+});
+
 // Restablecimiento de contraseña
 $controller->get('/auth/reset/', function () use ($viewManager) {
+    throw new Exception('Route declared but not implemented.');
+});
+
+// Envío del formulario de restablecimiento de contraseña
+$controller->post('/auth/reset/', function () use ($viewManager) {
     throw new Exception('Route declared but not implemented.');
 });
 
