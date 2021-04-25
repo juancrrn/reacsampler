@@ -10,10 +10,10 @@
  * @version 0.0.1
  */
 
-namespace Juancrrn\Reacsampler\Common\StaticForm\Auth;
+namespace Juancrrn\Reacsampler\Domain\StaticForm\Auth;
 
 use Juancrrn\Reacsampler\Common\App;
-use Juancrrn\Reacsampler\Common\StaticForm\StaticForm;
+use Juancrrn\Reacsampler\Domain\StaticForm\StaticForm;
 use Juancrrn\Reacsampler\Domain\User\UserRepository;
 
 class LoginForm extends StaticForm
@@ -35,12 +35,12 @@ class LoginForm extends StaticForm
         }
 
         $html = <<< HTML
-        <div class="form-group">
-            <label for="nif">NIF o NIE</label>
+        <div class="mb-3">
+            <label class="form-label" for="nif">NIF o NIE</label>
             <input class="form-control" id="nif" type="text" name="nif" placeholder="NIF o NIE" value="$nif">
         </div>
-        <div class="form-group">
-            <label for="password">Contraseña</label>
+        <div class="mb-3">
+            <label class="form-label" for="password">Contraseña</label>
             <input class="form-control" id="password" type="password" name="password" placeholder="Contraseña">
         </div>
         <button type="submit" class="btn btn-primary" name="login">Continuar</button>
@@ -54,11 +54,13 @@ class LoginForm extends StaticForm
         $app = App::getSingleton();
         $view = $app->getViewManagerInstance();
 
+        $userRepository = new UserRepository($app->getDbConn());
+
         $nif = isset($postedData['nif']) ? $postedData['nif'] : null;
                 
         if (empty($nif)) {
             $view->addErrorMessage('El NIF o NIE no puede estar vacío.');
-        } elseif (! UserRepository::findByNif($nif)) {
+        } elseif (! $userRepository->findByNif($nif)) {
             $view->addErrorMessage('El NIF o NIE y la contraseña introducidos no coinciden.');
         }
         
@@ -71,10 +73,11 @@ class LoginForm extends StaticForm
         // Si no hay ningún error, continuar.
         if (! $view->anyErrorMessages()) {
 
-            $user = UserRepository::retrieveById(UserRepository::findByNif($nif));
+            $user = $userRepository->retrieveById($userRepository->findByNif($nif));
+            var_dump($user);
 
             // Comprobar si la contraseña es correcta.
-            if (! password_verify($password, $user->getPassword())) {
+            /*if (! password_verify($password, $user->getPassword())) {
                 $view->addErrorMessage('El NIF o NIE y la contraseña introducidos no coinciden.');
             } else {
                 $sessionManager = $app->getSessionInstance();
@@ -84,7 +87,7 @@ class LoginForm extends StaticForm
                 header("Location: " . $app->getUrl());
                 
                 die();
-            }
+            }*/
 
         }
 
