@@ -18,7 +18,7 @@ abstract class StaticForm
 {
 
     /**
-     * @var string $formId  Cadena utilizada como valor del atributo "id" de la 
+     * @var string $id  Cadena utilizada como valor del atributo "id" de la 
      *                      etiqueta <form> asociada al formulario y como 
      *                      parámetro a comprobar para verificar que el usuario 
      *                      ha enviado el formulario.
@@ -44,7 +44,7 @@ abstract class StaticForm
     /**
      * Crea un nuevo formulario.
      * 
-     * @param string $formId Cadena utilizada como valor del atributo "id" de 
+     * @param string $id Cadena utilizada como valor del atributo "id" de 
      *                        la etiqueta <form> asociada al formulario y como 
      *                        parámetro a comprobar para verificar que el 
      *                        usuario ha enviado el formulario.
@@ -84,17 +84,17 @@ abstract class StaticForm
   
     /**
      * Verifica si el usuario ha enviado el formulario y para ello comprueba si 
-     * existe el parámetro $formId en $params.
+     * existe el parámetro $id en $params.
      *
      * @param array $params Array que contiene los datos recibidos en el envío 
      *                      formulario.
      *
-     * @return bool         Devuelve true si $formId existe como clave en 
+     * @return bool         Devuelve true si $id existe como clave en 
      *                      $params.
      */
     private function isSent(& $params)
     {
-        return isset($params["action"]) && $params["action"] == $this->formId;
+        return isset($params["action"]) && $params["action"] == $this->id;
     } 
 
     /**
