@@ -25,8 +25,7 @@ class ManagementStaff extends User
         \DateTime   $birthDate,
         \DateTime   $registrationDate,
         ?\DateTime  $lastLoginDate,
-        string      $area,
-        string      $collegiateNumber
+        string      $area
     )
     {
         parent::__construct(
@@ -43,7 +42,6 @@ class ManagementStaff extends User
         );
 
         $this->area             = $area;
-        $this->collegiateNumber = $collegiateNumber;
     }
 
     function isType(string $testType): bool
