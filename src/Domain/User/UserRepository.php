@@ -5,6 +5,9 @@ namespace Juancrrn\Reacsampler\Domain\User;
 use Juancrrn\Reacsampler\Common\App;
 use Juancrrn\Reacsampler\Domain\Repository;
 use Juancrrn\Reacsampler\Domain\User\LabStaff\LabStaffRepository;
+use Juancrrn\Reacsampler\Domain\User\ManagementStaff\ManagementStaffRepository;
+use Juancrrn\Reacsampler\Domain\User\MedicalStaff\MedicalStaffRepository;
+use Juancrrn\Reacsampler\Domain\User\NursingStaff\NursingStaffRepository;
 use Juancrrn\Reacsampler\Domain\User\Patient\PatientRepository;
 
 class UserRepository implements Repository
@@ -51,13 +54,13 @@ class UserRepository implements Repository
     {
         switch ($mysqli_object->type) {
             case User::TYPE_LAB_STAFF:
-                //return (new LabStaffRepository($this->db))->completeModel($mysqli_object);
+                return (new LabStaffRepository($this->db))->completeModel($mysqli_object);
             case User::TYPE_MANAGEMENT_STAFF:
-                break;//return (new ManagementStaffRepository($this->db))->completeModel($mysqli_object);
+                return (new ManagementStaffRepository($this->db))->completeModel($mysqli_object);
             case User::TYPE_MEDICAL_STAFF:
-                break;//return (new MedicalStaffRepository($this->db))->completeModel($mysqli_object);
+                return (new MedicalStaffRepository($this->db))->completeModel($mysqli_object);
             case User::TYPE_NURSING_STAFF:
-                break;//return (new NursingStaffRepository($this->db))->completeModel($mysqli_object);
+                return (new NursingStaffRepository($this->db))->completeModel($mysqli_object);
             case User::TYPE_PATIENT:
                 return (new PatientRepository($this->db))->completeModel($mysqli_object);
             default:
@@ -118,7 +121,6 @@ class UserRepository implements Repository
             last_login_date
         FROM
             users
-        LIMIT 1
         SQL;
 
         $stmt = $this->db->prepare($query);
