@@ -10,7 +10,7 @@
  * @version 0.0.1
  */
 
-namespace Juancrrn\Reacsampler\Common\StaticForm;
+namespace Juancrrn\Reacsampler\Domain\StaticForm;
 
 use Juancrrn\Reacsampler\Common\App;
 
