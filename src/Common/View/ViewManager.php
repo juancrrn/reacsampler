@@ -28,15 +28,29 @@ class ViewManager
     // Directorio donde se encuentran los ficheros comunes.
     private $viewResourcesPath;
 
+    // Subdirectorio para los elementos plantilla.
+    private const TEMPLATE_ELEMENT_SUBDIRECTORY = 'html_templates';
+
     // Valor de $_SESSION donde se almacenan los mensajes.
-    private const SESSION_MENSAJES = "gesi_mensajes";
+    private const SESSION_MESSAGES = 'reacsampler_session_messages';
+
+    // Array de elementos plantilla (<template>).
+    private $templateElements;
 
     private const TEMPLATE_FILE_EXTENSION = '.html';
 
     public function __construct(string $viewResourcesPath)
     {
         $this->viewResourcesPath = $viewResourcesPath;
+
+        $this->templateElements = array();
     }
+
+    /*
+     * 
+     * Página actual
+     * 
+     */
 
     /**
      * Establece el nombre y el id de la página actual.
@@ -70,10 +84,16 @@ class ViewManager
         return $this->currentPageId;
     }
 
+    /*
+     * 
+     * Cabecera y pie de página
+     * 
+     */
+
     /**
      * Genera la cabecera HTML y la incluye.
      */
-    private static function injectHeader(): void
+    private function injectHeader(): void
     {
         (new HeaderPartView())->processContent();
     }
@@ -81,14 +101,14 @@ class ViewManager
     /**
      * Genera el pie HTML y lo incluye.
      */
-    private static function injectFooter(): void
+    private function injectFooter(): void
     {
         (new FooterPartView())->processContent();
     }
 
-    /**
+    /*
      * 
-     * Mensajes para el usuario.
+     * Mensajes para el usuario
      * 
      */
 
@@ -99,9 +119,9 @@ class ViewManager
      * @param string $header_location Opcional para redirigir al mismo tiempo 
      * que se encola el mensaje.
      */
-    public static function addErrorMessage(string $mensaje, string $header_location = null): void
+    public function addErrorMessage(string $mensaje, string $header_location = null): void
     {
-        $_SESSION[self::SESSION_MENSAJES][] = array(
+        $_SESSION[self::SESSION_MESSAGES][] = array(
             "tipo" => "error",
             "contenido" => $mensaje
         );
@@ -119,9 +139,9 @@ class ViewManager
      * @param string $header_location Opcional para redirigir al mismo tiempo 
      * que se encola el mensaje.
      */
-    public static function addSuccessMessage(string $mensaje, string $header_location = null): void
+    public function addSuccessMessage(string $mensaje, string $header_location = null): void
     {
-        $_SESSION[self::SESSION_MENSAJES][] = array(
+        $_SESSION[self::SESSION_MESSAGES][] = array(
             "tipo" => "exito",
             "contenido" => $mensaje
         );
@@ -133,54 +153,12 @@ class ViewManager
     }
 
     /**
-     * Genera un elemento Bootstrap toast para mostrar un mensaje.
-     */
-    public static function generateToast(string $tipo, string $contenido): string
-    {
-        $app = App::getSingleton();
-        $autohide = $app->isDevMode() ? 'false' : 'true';
-        $appNombre = $app->getName();
-
-        $toast = <<< HTML
-        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="$autohide" data-delay="3000">
-            <div class="toast-header">
-                <span class="type-indicator $tipo"></span>
-                <strong class="mr-auto">$appNombre</strong>
-                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="toast-body">$contenido</div>
-        </div>
-        HTML;
-
-        return $toast;
-    }
-
-    /**
-     * Imprime todos los mensajes de la cola de mensajes.
-     */
-    public static function printMessages(): void
-    {
-        echo '<div id="toasts-container" aria-live="polite" aria-atomic="true">';
-
-        if (! empty($_SESSION[self::SESSION_MENSAJES])) {
-            foreach ($_SESSION[self::SESSION_MENSAJES] as $clave => $mensaje) {
-                echo self::generateToast($mensaje['tipo'], $mensaje['contenido']);
-
-                // Eliminar mensaje de la cola tras mostrarlo.
-                unset($_SESSION[self::SESSION_MENSAJES][$clave]);
-            }
-        }
-
-        echo '</div>';
-    }
-
-    /**
      * Comprueba si hay algún mensaje de error en la cola de mensajes.
      */
-    public static function anyErrorMessages(): bool
+    public function anyErrorMessages(): bool
     {
-        if (! empty($_SESSION[self::SESSION_MENSAJES])) {
-            foreach ($_SESSION[self::SESSION_MENSAJES] as $mensaje) {
+        if (! empty($_SESSION[self::SESSION_MESSAGES])) {
+            foreach ($_SESSION[self::SESSION_MESSAGES] as $mensaje) {
                 if ($mensaje["tipo"] == "error") {
                     return true;
                 }
@@ -190,6 +168,143 @@ class ViewManager
         return false;
     }
 
+    /*
+     * 
+     * Mensajes para el usuario (parte visible: toasts)
+     * 
+     */
+
+    /**
+     * Genera un elemento Bootstrap toast para mostrar un mensaje.
+     */
+    public function generateToast(string $tipo, string $contenido): string
+    {
+        $app = App::getSingleton();
+
+        return $this->generateTemplateRender(
+            self::TEMPLATE_ELEMENT_SUBDIRECTORY . DIRECTORY_SEPARATOR . 'template_toast',
+            array(
+                'autohide'  => $app->isDevMode() ? 'false' : 'true',
+                'type'      => $tipo,
+                'app-name'  => $app->getName(),
+                'content'   => $contenido
+            )
+        );
+    }
+
+    /**
+     * Imprime todos los mensajes de la cola de mensajes.
+     */
+    private function printToasts(): void
+    {
+        echo '<div id="toasts-container" aria-live="polite" aria-atomic="true">';
+
+        if (! empty($_SESSION[self::SESSION_MESSAGES])) {
+            foreach ($_SESSION[self::SESSION_MESSAGES] as $clave => $mensaje) {
+                echo self::generateToast($mensaje['tipo'], $mensaje['contenido']);
+
+                // Eliminar mensaje de la cola tras mostrarlo.
+                unset($_SESSION[self::SESSION_MESSAGES][$clave]);
+            }
+        }
+
+        echo '</div>';
+    }
+
+    /**
+     * Registra la plantilla de los toasts para el navegador e imprime las
+     * que haya disponibles.
+     */
+    private function addToastTemplateAndPrint(): void
+    {
+        self::addTemplateElement(
+            'toast',
+            'template_toast',
+            array(
+                'autohide'  => '',
+                'type'      => '',
+                'app-name'  => '',
+                'content'   => ''
+            )
+        );
+
+        self::printToasts();
+    }
+
+    /*
+     * 
+     * Elementos plantilla de HTML (<template>)
+     * 
+     */
+
+    /**
+     * Añade un elemento plantilla de HTML (<template>) para que luego sea
+     * añadido al código HTML y pueda ser clonado por un script en el navegador.
+     */
+    public function addTemplateElement(
+        string $htmlId,
+		string $fileName,
+		array $filling
+    ): void
+    {
+        $this->templateElements[] = array(
+            'html_id' => $htmlId,
+            'file_name' => $fileName,
+            'filling' => $filling
+        );
+    }
+
+    public function anyTemplateElements(): bool
+    {
+        if (! empty($this->templateElements)) 
+            return true;
+
+        return false;
+    }
+
+    /**
+     * Genera un elemento <template> para luego insertarlo en el HTML.
+     */
+    private function generateTemplateElementRender(
+        string $htmlId,
+		string $fileName,
+		array $filling
+    ): string
+    {
+        $filledTemplate = $this->generateTemplateRender(
+            self::TEMPLATE_ELEMENT_SUBDIRECTORY . DIRECTORY_SEPARATOR . $fileName,
+            $filling
+        );
+
+        return <<< HTML
+        <template id="$htmlId">
+            $filledTemplate
+        </template>
+        HTML;
+    }
+
+    /**
+     * Imprime todos los elementos <template> precargados.
+     */
+    private function printTemplateElements(): void
+    {
+        if ($this->anyTemplateElements()) {
+            foreach ($this->templateElements as $element) {
+                echo $this->generateTemplateElementRender(
+                    $element['html_id'],
+                    $element['file_name'],
+                    $element['filling']
+                );
+            }
+        }
+    }
+
+    /*
+     * 
+     * Renderizado de la vista
+     * 
+     */
+
     /**
      * Dibuja una vista completa y detiene la ejecución del script.
      */
@@ -197,9 +312,9 @@ class ViewManager
     {
         $this->setCurrentPage($vista->getName(), $vista->getId());
         
-        self::injectHeader();
+        $this->injectHeader();
 
-        self::printMessages();
+        $this->addToastTemplateAndPrint();
 
         echo <<< HTML
         <section id="main-container" class="container my-4 px-4">
@@ -213,10 +328,31 @@ class ViewManager
         </section>
         HTML;
 
-        self::injectFooter();
+        $this->printTemplateElements();
+
+        $this->injectFooter();
 
         //die(); // TODO No necesario
     }
+
+    /**
+     * Imprime una plantilla rellenada.
+     * 
+     * Ver ViewManager::generateTemplateRender().
+     */
+    public function renderTemplate(
+		string $fileName,
+		array $filling
+	): void
+	{
+        echo $this->generateTemplateRender($fileName, $filling);
+	}
+
+    /*
+     * 
+     * Elementos de menú
+     * 
+     */
 
     /**
      * Genera un item de una lista no ordenada (<li> de una <ul>) para el menú 
@@ -271,27 +407,11 @@ class ViewManager
         return $span;
     }
 
-    /**
-     * Genera un item divisor de una lista no ordenada (<li> de una <ul>) para 
-     * el menú principal lateral.
+    /*
      * 
-     * @param string $title
+     * Auxiliares
+     * 
      */
-    public function generateSideMenuDivider(string $title): string
-    {
-        $classAttr = 'class="list-group-item mt-3 side-menu-divider"';
-
-        $li = <<< HTML
-        <li $classAttr>$title</li>
-        HTML;
-
-        return $li;
-    }
-
-    /*protected function getViewResourcesPath(): string
-    {
-        return $this->viewResourcesPath;
-    }*/
 
     /**
      * Genera un contenido visual final a partir de un fichero de plantilla y
@@ -308,10 +428,10 @@ class ViewManager
      *                          Solo pueden darse valores de tipo cadena de
      *                          texto.
      */
-    public function renderTemplate(
+    public function generateTemplateRender(
 		string $fileName,
 		array $filling
-	): void
+	): string
 	{
 		$result = file_get_contents($this->viewResourcesPath . DIRECTORY_SEPARATOR . $fileName . self::TEMPLATE_FILE_EXTENSION);
 		
@@ -326,9 +446,7 @@ class ViewManager
                 $names[$i] = '#' . $names[$i] . '#';
             }
 
-			$result = str_replace($names, array_values($filling), $result);
-			
-			echo $result;
+			return str_replace($names, array_values($filling), $result);
 		}
 	}
 }
