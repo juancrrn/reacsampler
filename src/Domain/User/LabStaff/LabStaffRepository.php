@@ -2,6 +2,7 @@
 
 namespace Juancrrn\Reacsampler\Domain\User\LabStaff;
 
+use Exception;
 use Juancrrn\Reacsampler\Common\Tools;
 use Juancrrn\Reacsampler\Domain\User\User;
 use Juancrrn\Reacsampler\Domain\User\UserRepository;
@@ -32,10 +33,10 @@ class LabStaffRepository extends UserRepository
             $mysqli_object->last_name,
             $mysqli_object->phone_number,
             $mysqli_object->email_address,
-            $mysqli_object->hashed_password,
             $birthDate,
             $registrationDate,
             $lastLoginDate,
+            
             $mysqli_object->field,
             $mysqli_object->collegiate_number
         );
@@ -61,9 +62,13 @@ class LabStaffRepository extends UserRepository
         $stmt = $this->db->prepare($query);
         $stmt->bind_param('i', $mysqli_object->id);
         $stmt->execute();
-        $resultado = $stmt->get_result();
-        
-        $typeSpecificProperties = $resultado->fetch_object();
+
+        $result = $stmt->get_result();
+
+        if ($result->num_rows != 1)
+            throw new Exception('Row not found in specific type table.');
+
+        $typeSpecificProperties = $result->fetch_object();
         $mergedObjects = (object) array_merge((array) $mysqli_object, (array) $typeSpecificProperties);
 
         $labStaffUser = self::createModelFromMysql($mergedObjects);
