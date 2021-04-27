@@ -1,6 +1,6 @@
 <?php
 
-namespace Juancrrn\Reacsampler\Common;
+namespace Juancrrn\Reacsampler\Common\Controller;
 
 use Juancrrn\Reacsampler\Common\HTTP;
 
