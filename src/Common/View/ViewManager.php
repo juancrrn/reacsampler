@@ -2,6 +2,7 @@
 
 namespace Juancrrn\Reacsampler\Common\View;
 
+use InvalidArgumentException;
 use Juancrrn\Reacsampler\Common\App;
 use Juancrrn\Reacsampler\Common\View\Common\FooterPartView;
 use Juancrrn\Reacsampler\Common\View\Common\HeaderPartView;
@@ -365,17 +366,30 @@ class ViewManager
      * @param string $paginaId Identificador de la página de destino, para saber
      *                         si es la actual.
      */
-    public function generateMainMenuLink(string $url, $viewClass): string
+    public function generateMainMenuLink(string $viewClass): string
     {
+        if (! class_exists($viewClass)) {
+            throw new InvalidArgumentException('Specified view class ($viewClass) does not exist.');
+        }
+
+        if (
+            ! defined($viewClass . '::VIEW_ID') ||
+            ! defined($viewClass . '::VIEW_NAME') ||
+            ! defined($viewClass . '::VIEW_ROUTE')
+        ) {
+            throw new InvalidArgumentException('Specified view class ($viewClass) must have VIEW_ID, VIEW_NAME and VIEW_ROUTE constants defined and public.');
+        }
+
         $viewId = $viewClass::VIEW_ID;
         $viewName = $viewClass::VIEW_NAME;
+        $viewRoute = $viewClass::VIEW_ROUTE;
 
         $appUrl = App::getSingleton()->getUrl();
 
         $activeClass = $this->getCurrentPageId() === $viewId ? 'active' : '';
 
         $classAttr = 'class="nav-link ' . $activeClass . '"';
-        $hrefAttr = 'href="' . $appUrl . $url . '"';
+        $hrefAttr = 'href="' . $appUrl . $viewRoute . '"';
 
         $a = <<< HTML
         <li class="nav-item"><a $classAttr $hrefAttr>$viewName</a></li>

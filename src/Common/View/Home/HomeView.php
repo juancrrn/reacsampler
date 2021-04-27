@@ -18,9 +18,10 @@ use Juancrrn\Reacsampler\Common\View\ViewModel;
 class HomeView extends ViewModel
 {
 
-    private const VIEW_RESOURCE_FILE = 'home/view_home';
-    public const VIEW_NAME = "Inicio";
-    public const VIEW_ID = "home";
+    private const VIEW_RESOURCE_FILE    = 'home/view_home';
+    public  const VIEW_NAME             = 'Inicio';
+    public  const VIEW_ID               = 'home';
+    public  const VIEW_ROUTE            = '';
 
     public function __construct()
     {
