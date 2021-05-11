@@ -4,9 +4,12 @@ namespace Juancrrn\Reacsampler\Common\View\Common;
 
 use Juancrrn\Reacsampler\Common\App;
 use Juancrrn\Reacsampler\Common\View\Auth\LoginView;
+use Juancrrn\Reacsampler\Common\View\Domain\Lab\LabTestEditView;
+use Juancrrn\Reacsampler\Common\View\Domain\Lab\LabTestsView;
 use Juancrrn\Reacsampler\Common\View\ViewModel;
 use Juancrrn\Reacsampler\Common\View\Home\HomeView;
 use Juancrrn\Reacsampler\Domain\StaticForm\Auth\LogoutForm;
+use Juancrrn\Reacsampler\Domain\User\User;
 
 /**
  * Clase especial para la parte del pie de página.
@@ -41,61 +44,40 @@ class HeaderPartView extends ViewModel
         $mainMenuBuffer = '';
 
         // Generar elementos de navegación del menú lateral.
-        $mainMenuBuffer .= $viewManager->generateMainMenuLink('', HomeView::class);
+        $mainMenuBuffer .= $viewManager->generateMainMenuLink(HomeView::class);
 
-        /*
-            $sideMenuBuffer .= Vista::generarSideMenuDivider('Acciones públicas');
-            $sideMenuBuffer .= Vista::generarSideMenuLink(
-                '/inv/eventos/', EventoInvList::class);
+        if ($sessionManager->isLoggedIn()) {
+            $user = $sessionManager->getLoggedInUser();
 
-            if (Sesion::isSesionIniciada()) {
-                $sideMenuBuffer .= Vista::generarSideMenuDivider('Acciones personales');
-
-                $sideMenuBuffer .= Vista::generarSideMenuLink(
-                    '/ses/secretaria/', MensajeSecretariaSesList::class);
-
-                if (Sesion::getUsuarioEnSesion()->isEst()) {
-                    $sideMenuBuffer .= Vista::generarSideMenuDivider(
-                        'Acciones de estudiantes');
-
-                    $sideMenuBuffer .= Vista::generarSideMenuLink(
-                        '/est/asignaciones/', AsignacionEstList::class);
-                    $sideMenuBuffer .= Vista::generarSideMenuLink(
-                        '/est/asignaciones/horario/', AsignacionEstHorario::class);
-                } elseif (Sesion::getUsuarioEnSesion()->isPd()) {
-                    $sideMenuBuffer .= Vista::generarSideMenuDivider(
-                        'Acciones de personal docente');
-
-                    $sideMenuBuffer .= Vista::generarSideMenuLink(
-                        '/pd/asignaciones/', AsignacionPdList::class);
-                    $sideMenuBuffer .= Vista::generarSideMenuLink(
-                        '/pd/asignaciones/horario/', AsignacionPdHorario::class);
-                } elseif (Sesion::getUsuarioEnSesion()->isPs()) {
-                    $sideMenuBuffer .= Vista::generarSideMenuDivider(
-                        'Acciones de administración');
-
-                    $sideMenuBuffer .= Vista::generarSideMenuLink(
-                        '/ps/secretaria/', MensajeSecretariaPsList::class);
-                    $sideMenuBuffer .= Vista::generarSideMenuLink(
-                        '/ps/asignaturas/', AsignaturaPsList::class);
-                    $sideMenuBuffer .= Vista::generarSideMenuLink(
-                        '/ps/grupos/', GrupoPsList::class);
-                    $sideMenuBuffer .= Vista::generarSideMenuLink(
-                        '/ps/usuarios/', UsuarioPsList::class);
-                    $sideMenuBuffer .= Vista::generarSideMenuLink(
-                        '/ps/asignaciones/', AsignacionPsList::class);
-                    $sideMenuBuffer .= Vista::generarSideMenuLink(
-                        '/ps/eventos/', EventoPsList::class);
-                    $sideMenuBuffer .= Vista::generarSideMenuLink(
-                        '/ps/foros/', ForoPsList::class);
+            switch ($user->getType()) {
+                case User::TYPE_LAB_STAFF: {
+                    $mainMenuBuffer .= $viewManager->generateMainMenuLink(LabTestsView::class);
+                    break;
                 }
-            } else {
-                $sideMenuBuffer .= Vista::generarSideMenuLink(
-                    '/inv/mensajesecretaria/', MensajeSecretariaInvList::class);
-            }
 
-            // Generar elementos de la navegación del menú de sesión de usuario.
-        */
+                case User::TYPE_MANAGEMENT_STAFF: {
+                    
+                    break;
+                }
+
+                case User::TYPE_MEDICAL_STAFF: {
+                    
+                    break;
+                }
+
+                case User::TYPE_NURSING_STAFF: {
+                    
+                    break;
+                }
+
+                case User::TYPE_PATIENT: {
+                    
+                    break;
+                }
+            }
+        }
+
+        // Generar elementos de la navegación del menú de sesión de usuario.
 
         $userMenuBuffer = ''; 
 
@@ -106,12 +88,26 @@ class HeaderPartView extends ViewModel
 
             $profileUrl = $app->getUrl() . '/self/profile/';
             
-            /*$badges = '';
-            $badges .= $u->isEst() ? '<span class="badge badge-secondary">Estudiante</span>' : '';
-            $badges .= $u->isPd() ? '<span class="badge badge-secondary">Personal docente</span>' : '';
-            $badges .= $u->isPs() ? '<span class="badge badge-secondary">Personal de Secretaría</span>' : '';*/
+            switch ($user->getType()) {
+                case User::TYPE_LAB_STAFF:
+                    $userTypeTitle = 'lab';
+                    break;
+                case User::TYPE_MANAGEMENT_STAFF:
+                    $userTypeTitle = 'gestión';
+                    break;
+                case User::TYPE_MEDICAL_STAFF:
+                    $userTypeTitle = 'medicina';
+                    break;
+                case User::TYPE_NURSING_STAFF:
+                    $userTypeTitle = 'enfermería';
+                    break;
+                case User::TYPE_PATIENT:
+                    $userTypeTitle = 'paciente';
+                    break;
+            }
 
-            $userMenuBuffer .= $viewManager->generateUserMenuItem("<a class=\"nav-link\" href=\"$profileUrl\">$fullName</a>");
+            $userMenuBuffer .= $viewManager->generateUserMenuItem('<a class="nav-link" href="' . $profileUrl . '">' . $fullName . '</a>');
+            $userMenuBuffer .= $viewManager->generateUserMenuItem('<span class="badge bg-secondary rcs-user-type-badge">' . $userTypeTitle . '</span>');
             $userMenuBuffer .= $viewManager->generateUserMenuItem($logoutForm->getHtml());
         } else {
             $loginUrl = $app->getUrl() . '/auth/login/';

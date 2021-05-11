@@ -5,6 +5,7 @@ namespace Juancrrn\Reacsampler\Common;
 use Juancrrn\Reacsampler\Common\Session;
 
 use DateTime;
+use Juancrrn\Reacsampler\Common\Controller\Controller;
 use Juancrrn\Reacsampler\Common\View\ViewManager;
 
 /**
